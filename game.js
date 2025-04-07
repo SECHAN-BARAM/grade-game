@@ -409,6 +409,7 @@ const canvasRect = canvas.getBoundingClientRect();
 function drawProfessor() {
     const isMobile = window.innerWidth <= 768;
     const scale = isMobile ? window.innerWidth / 800 : 1;
+    const sizeScale = isMobile ? 0.8 : 1; // 모바일에서는 크기를 80%로 조정
     
     // HTML 요소 위치 업데이트 (Canvas 좌표 기준)
     professorElement.style.left = (canvasRect.left + professor.x * scale) + 'px';
@@ -425,6 +426,7 @@ function drawProfessor() {
 function drawPlayer() {
     const isMobile = window.innerWidth <= 768;
     const scale = isMobile ? window.innerWidth / 800 : 1;
+    const sizeScale = isMobile ? 0.8 : 1; // 모바일에서는 크기를 80%로 조정
     
     // HTML 요소 위치 업데이트 (Canvas 좌표 기준)
     playerElement.style.left = (canvasRect.left + player.x * scale) + 'px';
@@ -507,13 +509,36 @@ function draw() {
 
 // HTML 요소 위치 업데이트 함수
 function updateHTMLElementsPosition() {
+    const isMobile = window.innerWidth <= 768;
+    const scale = isMobile ? window.innerWidth / 800 : 1;
+    
     // 교수와 플레이어 위치 업데이트
     drawProfessor();
     drawPlayer();
     
     // 수집한 학점 영역 위치 업데이트
-    collectedGradesElement.style.top = (canvasRect.top + canvas.height + 20) + 'px';
-    collectedGradesElement.style.left = canvasRect.left + 'px';
+    if (collectedGradesElement) {
+        if (isMobile) {
+            collectedGradesElement.style.top = (canvasRect.top + canvas.height * scale + 20) + 'px';
+        } else {
+            collectedGradesElement.style.top = (canvasRect.top + canvas.height + 20) + 'px';
+        }
+        collectedGradesElement.style.left = canvasRect.left + 'px';
+    }
+    
+    // 게임 제목 위치 업데이트
+    if (titleElement) {
+        if (isMobile) {
+            titleElement.style.top = (canvasRect.top - 40) + 'px';
+        } else {
+            titleElement.style.top = '60px';
+        }
+    }
+    
+    // 점수 표시 위치 업데이트
+    if (scoreElement && isMobile) {
+        scoreElement.style.top = (canvasRect.top - 10) + 'px';
+    }
 }
 
 // 수집한 학점 블록 표시 업데이트
@@ -525,15 +550,20 @@ function updateCollectedGrades() {
     for (let i = 0; i < collectedGrades.length; i++) {
         const grade = collectedGrades[i];
         const blockElement = document.createElement('div');
-        blockElement.style.width = '40px';
-        blockElement.style.height = '40px';
+        
+        // 모바일 화면에서 블록 크기 조정
+        const isMobile = window.innerWidth <= 768;
+        const blockSize = isMobile ? '30px' : '40px';
+        
+        blockElement.style.width = blockSize;
+        blockElement.style.height = blockSize;
         blockElement.style.backgroundColor = grades[grade].color;
         blockElement.style.display = 'flex';
         blockElement.style.justifyContent = 'center';
         blockElement.style.alignItems = 'center';
         blockElement.style.color = '#FFFFFF';
         blockElement.style.fontWeight = 'bold';
-        blockElement.style.fontSize = '14px';
+        blockElement.style.fontSize = isMobile ? '12px' : '14px';
         blockElement.style.borderRadius = '5px';
         blockElement.style.flexShrink = '0'; // 크기 고정
         
@@ -585,10 +615,27 @@ function resetGame() {
 function resizeCanvas() {
     const isMobile = window.innerWidth <= 768;
     if (isMobile) {
-        // 모바일에서는 화면 너비에 맞게 조정
-        const scale = window.innerWidth / 800; // 800은 기본 캔버스 너비
-        canvas.style.width = (800 * scale) + 'px';
-        canvas.style.height = (600 * scale) + 'px';
+        // 9:16 비율 계산
+        const screenWidth = window.innerWidth;
+        const screenHeight = window.innerHeight;
+        const aspectRatio = 9/16;
+        
+        // 화면 너비에 맞게 조정하되 9:16 비율 유지
+        let canvasWidth = screenWidth;
+        let canvasHeight = screenWidth / aspectRatio;
+        
+        // 화면 높이가 충분하지 않으면 높이에 맞게 조정
+        if (canvasHeight > screenHeight * 0.8) {
+            canvasHeight = screenHeight * 0.8;
+            canvasWidth = canvasHeight * aspectRatio;
+        }
+        
+        // 캔버스 크기 설정
+        canvas.style.width = canvasWidth + 'px';
+        canvas.style.height = canvasHeight + 'px';
+        
+        // 스케일 계산
+        const scale = canvasWidth / 800; // 800은 기본 캔버스 너비
         
         // 모바일에서 더 큰 터치 영역을 위한 컨트롤 버튼 추가
         if (!document.getElementById('mobileControls')) {
@@ -604,25 +651,25 @@ function resizeCanvas() {
             controls.style.zIndex = '30';
             
             const leftBtn = document.createElement('div');
-            leftBtn.style.width = '100px';
-            leftBtn.style.height = '100px';
-            leftBtn.style.backgroundColor = 'rgba(255, 255, 255, 0.3)';
+            leftBtn.style.width = '60px';
+            leftBtn.style.height = '60px';
+            leftBtn.style.backgroundColor = 'rgba(255, 255, 255, 0.5)';
             leftBtn.style.borderRadius = '50%';
             leftBtn.style.display = 'flex';
             leftBtn.style.justifyContent = 'center';
             leftBtn.style.alignItems = 'center';
-            leftBtn.style.fontSize = '24px';
+            leftBtn.style.fontSize = '20px';
             leftBtn.textContent = '←';
             
             const rightBtn = document.createElement('div');
-            rightBtn.style.width = '100px';
-            rightBtn.style.height = '100px';
-            rightBtn.style.backgroundColor = 'rgba(255, 255, 255, 0.3)';
+            rightBtn.style.width = '60px';
+            rightBtn.style.height = '60px';
+            rightBtn.style.backgroundColor = 'rgba(255, 255, 255, 0.5)';
             rightBtn.style.borderRadius = '50%';
             rightBtn.style.display = 'flex';
             rightBtn.style.justifyContent = 'center';
             rightBtn.style.alignItems = 'center';
-            rightBtn.style.fontSize = '24px';
+            rightBtn.style.fontSize = '20px';
             rightBtn.textContent = '→';
             
             controls.appendChild(leftBtn);
@@ -630,31 +677,52 @@ function resizeCanvas() {
             document.body.appendChild(controls);
         }
         
-        // 모바일에서 이미지 크기 조정
+        // 모바일에서 이미지 크기 조정 (더 작게)
         if (playerElement) {
-            playerElement.style.width = (player.width * scale) + 'px';
-            playerElement.style.height = (player.height * scale) + 'px';
+            playerElement.style.width = (player.width * scale * 0.7) + 'px';
+            playerElement.style.height = (player.height * scale * 0.7) + 'px';
         }
         
         if (professorElement) {
-            professorElement.style.width = (professor.width * scale) + 'px';
-            professorElement.style.height = (professor.height * scale) + 'px';
+            professorElement.style.width = (professor.width * scale * 0.7) + 'px';
+            professorElement.style.height = (professor.height * scale * 0.7) + 'px';
         }
         
         // 대체 텍스트 크기 조정
         if (playerElement && playerElement.textElement) {
-            playerElement.textElement.style.width = (player.width * scale) + 'px';
-            playerElement.textElement.style.height = (player.height * scale) + 'px';
+            playerElement.textElement.style.width = (player.width * scale * 0.7) + 'px';
+            playerElement.textElement.style.height = (player.height * scale * 0.7) + 'px';
         }
         
         if (professorElement && professorElement.textElement) {
-            professorElement.textElement.style.width = (professor.width * scale) + 'px';
-            professorElement.textElement.style.height = (professor.height * scale) + 'px';
+            professorElement.textElement.style.width = (professor.width * scale * 0.7) + 'px';
+            professorElement.textElement.style.height = (professor.height * scale * 0.7) + 'px';
         }
         
         // 수집한 학점 영역 크기 조정
         if (collectedGradesElement) {
-            collectedGradesElement.style.width = (canvas.width * scale) + 'px';
+            collectedGradesElement.style.width = canvasWidth + 'px';
+            collectedGradesElement.style.height = '80px'; // 높이 감소
+            collectedGradesElement.style.top = (canvasRect.top + canvasHeight + 10) + 'px';
+            collectedGradesElement.style.left = canvasRect.left + 'px';
+            collectedGradesElement.style.zIndex = '10';
+            collectedGradesElement.style.fontSize = '12px'; // 글꼴 크기 감소
+        }
+        
+        // 게임 제목 위치 조정
+        if (titleElement) {
+            titleElement.style.top = (canvasRect.top - 30) + 'px';
+            titleElement.style.fontSize = '16px';
+        }
+        
+        // 점수 표시 위치 조정
+        if (scoreElement) {
+            scoreElement.style.position = 'absolute';
+            scoreElement.style.top = (canvasRect.top - 10) + 'px';
+            scoreElement.style.left = '50%';
+            scoreElement.style.transform = 'translateX(-50%)';
+            scoreElement.style.fontSize = '14px';
+            scoreElement.style.zIndex = '20';
         }
     } else {
         // 데스크톱에서는 원래 크기로
@@ -686,6 +754,23 @@ function resizeCanvas() {
         // 수집한 학점 영역 크기 원래대로
         if (collectedGradesElement) {
             collectedGradesElement.style.width = canvas.width + 'px';
+            collectedGradesElement.style.height = '100px';
+            collectedGradesElement.style.top = (canvasRect.top + canvas.height + 20) + 'px';
+            collectedGradesElement.style.left = canvasRect.left + 'px';
+            collectedGradesElement.style.zIndex = '5';
+            collectedGradesElement.style.fontSize = '16px';
+        }
+        
+        // 게임 제목 위치 원래대로
+        if (titleElement) {
+            titleElement.style.top = '60px';
+            titleElement.style.fontSize = '24px';
+        }
+        
+        // 점수 표시 위치 원래대로
+        if (scoreElement) {
+            scoreElement.style.position = 'static';
+            scoreElement.style.fontSize = '24px';
         }
         
         // 모바일 컨트롤 제거
