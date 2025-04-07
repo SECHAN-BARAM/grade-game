@@ -216,10 +216,10 @@ function calculateAverage() {
 // 게임 업데이트
 function update() {
     if (gameOver) return;
-
+    
     // 교수 업데이트
     updateProfessor();
-
+    
     // 플레이어 이동 (키보드 + 터치)
     if ((keys.left || touchControls.left) && player.x > 0) {
         player.x -= player.speed;
@@ -227,15 +227,15 @@ function update() {
     if ((keys.right || touchControls.right) && player.x < canvas.width - player.width) {
         player.x += player.speed;
     }
-
+    
     // 블록 생성
     spawnBlocks();
-
+    
     // 블록 이동 및 충돌 체크
     for (let i = fallingBlocks.length - 1; i >= 0; i--) {
         const block = fallingBlocks[i];
         block.y += block.speed;
-
+        
         // 충돌 체크
         if (checkCollision(player, block)) {
             totalScore += grades[block.grade].score;
@@ -263,7 +263,7 @@ function update() {
             scoreElement.textContent = `평균 학점: ${calculateAverage()} | F: ${fCount}/4 | 획득: ${totalBlocks}/${MAX_BLOCKS}`;
             continue;
         }
-
+        
         // 화면 밖으로 나간 블록 제거
         if (block.y > canvas.height) {
             fallingBlocks.splice(i, 1);
@@ -357,6 +357,11 @@ playerElement.style.zIndex = '15';
 playerElement.style.pointerEvents = 'none'; // 마우스 이벤트 무시
 document.body.appendChild(playerElement);
 
+professorElement.style.position = 'absolute';
+professorElement.style.width = professor.width + 'px';
+professorElement.style.height = professor.height + 'px';
+professorElement.style.zIndex = '15';
+professorElement.style.pointerEvents = 'none'; // 마우스 이벤트 무시
 document.body.appendChild(professorElement);
 
 // 게임 제목 요소 생성
@@ -412,13 +417,17 @@ function drawProfessor() {
     const sizeScale = isMobile ? 0.7 : 1; // 모바일에서는 크기를 70%로 조정
     
     // HTML 요소 위치 업데이트 (Canvas 좌표 기준)
-    professorElement.style.left = (canvasRect.left + professor.x * scale) + 'px';
-    professorElement.style.top = (canvasRect.top + professor.y * scale) + 'px';
+    // 모바일에서는 교수 위치를 상단에 고정
+    const professorX = professor.x * scale;
+    const professorY = isMobile ? 0 : professor.y * scale; // 모바일에서는 y 좌표를 0으로 설정
+    
+    professorElement.style.left = (canvasRect.left + professorX) + 'px';
+    professorElement.style.top = (canvasRect.top + professorY) + 'px';
     
     // 이미지 로드 실패 시 대체 텍스트 위치 업데이트
     if (professorElement.textElement) {
-        professorElement.textElement.style.left = (canvasRect.left + professor.x * scale) + 'px';
-        professorElement.textElement.style.top = (canvasRect.top + professor.y * scale) + 'px';
+        professorElement.textElement.style.left = (canvasRect.left + professorX) + 'px';
+        professorElement.textElement.style.top = (canvasRect.top + professorY) + 'px';
     }
 }
 
