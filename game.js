@@ -361,7 +361,7 @@ document.body.appendChild(professorElement);
 
 // 게임 제목 요소 생성
 const titleElement = document.createElement('div');
-titleElement.textContent = '학점 골라받아먹기:';
+titleElement.textContent = '교수님을 열심히 쫓아다니지만 학점은 골라받고 싶은 나:';
 titleElement.style.position = 'absolute';
 titleElement.style.top = '60px';
 titleElement.style.left = '50%';
@@ -409,7 +409,7 @@ const canvasRect = canvas.getBoundingClientRect();
 function drawProfessor() {
     const isMobile = window.innerWidth <= 768;
     const scale = isMobile ? window.innerWidth / 800 : 1;
-    const sizeScale = isMobile ? 0.8 : 1; // 모바일에서는 크기를 80%로 조정
+    const sizeScale = isMobile ? 0.7 : 1; // 모바일에서는 크기를 70%로 조정
     
     // HTML 요소 위치 업데이트 (Canvas 좌표 기준)
     professorElement.style.left = (canvasRect.left + professor.x * scale) + 'px';
@@ -519,7 +519,7 @@ function updateHTMLElementsPosition() {
     // 수집한 학점 영역 위치 업데이트
     if (collectedGradesElement) {
         if (isMobile) {
-            collectedGradesElement.style.top = (canvasRect.top + canvas.height * scale + 20) + 'px';
+            collectedGradesElement.style.top = (canvasRect.top + canvas.height * scale + 10) + 'px';
         } else {
             collectedGradesElement.style.top = (canvasRect.top + canvas.height + 20) + 'px';
         }
@@ -529,7 +529,7 @@ function updateHTMLElementsPosition() {
     // 게임 제목 위치 업데이트
     if (titleElement) {
         if (isMobile) {
-            titleElement.style.top = (canvasRect.top - 40) + 'px';
+            titleElement.style.top = (canvasRect.top - 30) + 'px';
         } else {
             titleElement.style.top = '60px';
         }
@@ -686,6 +686,8 @@ function resizeCanvas() {
         if (professorElement) {
             professorElement.style.width = (professor.width * scale * 0.7) + 'px';
             professorElement.style.height = (professor.height * scale * 0.7) + 'px';
+            // 교수 이미지가 상단에 표시되도록 z-index 설정
+            professorElement.style.zIndex = '15';
         }
         
         // 대체 텍스트 크기 조정
@@ -697,6 +699,8 @@ function resizeCanvas() {
         if (professorElement && professorElement.textElement) {
             professorElement.textElement.style.width = (professor.width * scale * 0.7) + 'px';
             professorElement.textElement.style.height = (professor.height * scale * 0.7) + 'px';
+            // 교수 텍스트가 상단에 표시되도록 z-index 설정
+            professorElement.textElement.style.zIndex = '15';
         }
         
         // 수집한 학점 영역 크기 조정
@@ -713,6 +717,8 @@ function resizeCanvas() {
         if (titleElement) {
             titleElement.style.top = (canvasRect.top - 30) + 'px';
             titleElement.style.fontSize = '16px';
+            titleElement.style.width = '90%';
+            titleElement.style.textAlign = 'center';
         }
         
         // 점수 표시 위치 조정
@@ -765,6 +771,7 @@ function resizeCanvas() {
         if (titleElement) {
             titleElement.style.top = '60px';
             titleElement.style.fontSize = '24px';
+            titleElement.style.width = 'auto';
         }
         
         // 점수 표시 위치 원래대로
