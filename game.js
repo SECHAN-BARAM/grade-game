@@ -407,27 +407,33 @@ const canvasRect = canvas.getBoundingClientRect();
 
 // 교수 그리기
 function drawProfessor() {
+    const isMobile = window.innerWidth <= 768;
+    const scale = isMobile ? window.innerWidth / 800 : 1;
+    
     // HTML 요소 위치 업데이트 (Canvas 좌표 기준)
-    professorElement.style.left = (canvasRect.left + professor.x) + 'px';
-    professorElement.style.top = (canvasRect.top + professor.y) + 'px';
+    professorElement.style.left = (canvasRect.left + professor.x * scale) + 'px';
+    professorElement.style.top = (canvasRect.top + professor.y * scale) + 'px';
     
     // 이미지 로드 실패 시 대체 텍스트 위치 업데이트
     if (professorElement.textElement) {
-        professorElement.textElement.style.left = (canvasRect.left + professor.x) + 'px';
-        professorElement.textElement.style.top = (canvasRect.top + professor.y) + 'px';
+        professorElement.textElement.style.left = (canvasRect.left + professor.x * scale) + 'px';
+        professorElement.textElement.style.top = (canvasRect.top + professor.y * scale) + 'px';
     }
 }
 
 // 플레이어 그리기
 function drawPlayer() {
+    const isMobile = window.innerWidth <= 768;
+    const scale = isMobile ? window.innerWidth / 800 : 1;
+    
     // HTML 요소 위치 업데이트 (Canvas 좌표 기준)
-    playerElement.style.left = (canvasRect.left + player.x) + 'px';
-    playerElement.style.top = (canvasRect.top + player.y) + 'px';
+    playerElement.style.left = (canvasRect.left + player.x * scale) + 'px';
+    playerElement.style.top = (canvasRect.top + player.y * scale) + 'px';
     
     // 이미지 로드 실패 시 대체 텍스트 위치 업데이트
     if (playerElement.textElement) {
-        playerElement.textElement.style.left = (canvasRect.left + player.x) + 'px';
-        playerElement.textElement.style.top = (canvasRect.top + player.y) + 'px';
+        playerElement.textElement.style.left = (canvasRect.left + player.x * scale) + 'px';
+        playerElement.textElement.style.top = (canvasRect.top + player.y * scale) + 'px';
     }
 }
 
@@ -623,10 +629,64 @@ function resizeCanvas() {
             controls.appendChild(rightBtn);
             document.body.appendChild(controls);
         }
+        
+        // 모바일에서 이미지 크기 조정
+        if (playerElement) {
+            playerElement.style.width = (player.width * scale) + 'px';
+            playerElement.style.height = (player.height * scale) + 'px';
+        }
+        
+        if (professorElement) {
+            professorElement.style.width = (professor.width * scale) + 'px';
+            professorElement.style.height = (professor.height * scale) + 'px';
+        }
+        
+        // 대체 텍스트 크기 조정
+        if (playerElement && playerElement.textElement) {
+            playerElement.textElement.style.width = (player.width * scale) + 'px';
+            playerElement.textElement.style.height = (player.height * scale) + 'px';
+        }
+        
+        if (professorElement && professorElement.textElement) {
+            professorElement.textElement.style.width = (professor.width * scale) + 'px';
+            professorElement.textElement.style.height = (professor.height * scale) + 'px';
+        }
+        
+        // 수집한 학점 영역 크기 조정
+        if (collectedGradesElement) {
+            collectedGradesElement.style.width = (canvas.width * scale) + 'px';
+        }
     } else {
         // 데스크톱에서는 원래 크기로
         canvas.style.width = '800px';
         canvas.style.height = '600px';
+        
+        // 데스크톱에서 이미지 크기 원래대로
+        if (playerElement) {
+            playerElement.style.width = player.width + 'px';
+            playerElement.style.height = player.height + 'px';
+        }
+        
+        if (professorElement) {
+            professorElement.style.width = professor.width + 'px';
+            professorElement.style.height = professor.height + 'px';
+        }
+        
+        // 대체 텍스트 크기 원래대로
+        if (playerElement && playerElement.textElement) {
+            playerElement.textElement.style.width = player.width + 'px';
+            playerElement.textElement.style.height = player.height + 'px';
+        }
+        
+        if (professorElement && professorElement.textElement) {
+            professorElement.textElement.style.width = professor.width + 'px';
+            professorElement.textElement.style.height = professor.height + 'px';
+        }
+        
+        // 수집한 학점 영역 크기 원래대로
+        if (collectedGradesElement) {
+            collectedGradesElement.style.width = canvas.width + 'px';
+        }
         
         // 모바일 컨트롤 제거
         const mobileControls = document.getElementById('mobileControls');
@@ -634,6 +694,12 @@ function resizeCanvas() {
             mobileControls.remove();
         }
     }
+    
+    // 캔버스 위치 업데이트
+    canvasRect = canvas.getBoundingClientRect();
+    
+    // HTML 요소 위치 업데이트
+    updateHTMLElementsPosition();
 }
 
 // 게임 시작 시 캔버스 크기 조정
