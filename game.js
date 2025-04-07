@@ -289,12 +289,67 @@ function imageLoaded() {
     }
 }
 
+// 이미지 로드 실패 처리
+function imageError() {
+    imagesLoaded++;
+    if (imagesLoaded === totalImages) {
+        // 이미지 로드 실패 시에도 게임 시작
+        console.log("이미지 로드 실패, 게임을 시작합니다.");
+        gameLoop();
+    }
+}
+
 playerImage.onload = imageLoaded;
 professorImage.onload = imageLoaded;
+playerImage.onerror = imageError;
+professorImage.onerror = imageError;
 
 // HTML 요소로 GIF 표시
 const playerElement = document.createElement('img');
 playerElement.src = 'catgif.gif';
+playerElement.onerror = function() {
+    // 이미지 로드 실패 시 대체 텍스트 표시
+    this.style.display = 'none';
+    const textElement = document.createElement('div');
+    textElement.textContent = '플레이어';
+    textElement.style.position = 'absolute';
+    textElement.style.width = player.width + 'px';
+    textElement.style.height = player.height + 'px';
+    textElement.style.backgroundColor = '#3498db';
+    textElement.style.color = 'white';
+    textElement.style.display = 'flex';
+    textElement.style.justifyContent = 'center';
+    textElement.style.alignItems = 'center';
+    textElement.style.fontWeight = 'bold';
+    textElement.style.zIndex = '15';
+    textElement.style.pointerEvents = 'none';
+    document.body.appendChild(textElement);
+    playerElement.textElement = textElement;
+};
+
+const professorElement = document.createElement('img');
+professorElement.src = 'catgif2.gif';
+professorElement.onerror = function() {
+    // 이미지 로드 실패 시 대체 텍스트 표시
+    this.style.display = 'none';
+    const textElement = document.createElement('div');
+    textElement.textContent = '교수';
+    textElement.style.position = 'absolute';
+    textElement.style.width = professor.width + 'px';
+    textElement.style.height = professor.height + 'px';
+    textElement.style.backgroundColor = '#e74c3c';
+    textElement.style.color = 'white';
+    textElement.style.display = 'flex';
+    textElement.style.justifyContent = 'center';
+    textElement.style.alignItems = 'center';
+    textElement.style.fontWeight = 'bold';
+    textElement.style.zIndex = '15';
+    textElement.style.pointerEvents = 'none';
+    document.body.appendChild(textElement);
+    professorElement.textElement = textElement;
+};
+
+// HTML 요소로 GIF 표시
 playerElement.style.position = 'absolute';
 playerElement.style.width = player.width + 'px';
 playerElement.style.height = player.height + 'px';
@@ -302,13 +357,6 @@ playerElement.style.zIndex = '15';
 playerElement.style.pointerEvents = 'none'; // 마우스 이벤트 무시
 document.body.appendChild(playerElement);
 
-const professorElement = document.createElement('img');
-professorElement.src = 'catgif2.gif';
-professorElement.style.position = 'absolute';
-professorElement.style.width = professor.width + 'px';
-professorElement.style.height = professor.height + 'px';
-professorElement.style.zIndex = '15';
-professorElement.style.pointerEvents = 'none'; // 마우스 이벤트 무시
 document.body.appendChild(professorElement);
 
 // 게임 제목 요소 생성
@@ -362,6 +410,12 @@ function drawProfessor() {
     // HTML 요소 위치 업데이트 (Canvas 좌표 기준)
     professorElement.style.left = (canvasRect.left + professor.x) + 'px';
     professorElement.style.top = (canvasRect.top + professor.y) + 'px';
+    
+    // 이미지 로드 실패 시 대체 텍스트 위치 업데이트
+    if (professorElement.textElement) {
+        professorElement.textElement.style.left = (canvasRect.left + professor.x) + 'px';
+        professorElement.textElement.style.top = (canvasRect.top + professor.y) + 'px';
+    }
 }
 
 // 플레이어 그리기
@@ -369,6 +423,12 @@ function drawPlayer() {
     // HTML 요소 위치 업데이트 (Canvas 좌표 기준)
     playerElement.style.left = (canvasRect.left + player.x) + 'px';
     playerElement.style.top = (canvasRect.top + player.y) + 'px';
+    
+    // 이미지 로드 실패 시 대체 텍스트 위치 업데이트
+    if (playerElement.textElement) {
+        playerElement.textElement.style.left = (canvasRect.left + player.x) + 'px';
+        playerElement.textElement.style.top = (canvasRect.top + player.y) + 'px';
+    }
 }
 
 // 게임 렌더링
